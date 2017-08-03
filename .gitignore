@@ -1,0 +1,11 @@
+### Git Ignore
+
+## IDE
+.settings/
+.buildpath
+.project
+.idea/
+
+## Composer
+vendor/
+composer.lock
