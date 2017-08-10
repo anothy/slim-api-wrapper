@@ -55,9 +55,10 @@ class SlimApiWrapper
     }
 
     /**
-     * @param $method
-     * @param $routeName
-     * @param $options
+     * @param string $method    HTTP Method.
+     * @param string $routeName Given route name.
+     * @param array  $options   'namedArgs', 'payload', 'queryParams',
+     *                          and 'headers'
      *
      * @return array
      */
@@ -107,7 +108,8 @@ class SlimApiWrapper
      *
      * @param string $method    HTTP Method.
      * @param string $routeName Given route name.
-     * @param array  $options   'namedArgs', 'payload', 'queryParams', and 'headers'
+     * @param array  $options   'namedArgs', 'payload', 'queryParams',
+     *                          and 'headers'
      *
      * @return mixed
      *
@@ -124,7 +126,7 @@ class SlimApiWrapper
         );
 
         //
-        // Skip the Middleware in the path and go straight to the app.
+        // Skip the Middleware in the path and go straight to the Slim app.
         //
         list($routeCallable, $routeMethod) = explode(
             ':',
@@ -162,7 +164,8 @@ class SlimApiWrapper
      *
      * @param string $method    HTTP Method.
      * @param string $routeName Given route name.
-     * @param array  $options   'namedArgs', 'payload', 'queryParams', and 'headers'
+     * @param array  $options   'namedArgs', 'payload', 'queryParams',
+     *                          and 'headers'
      *
      * @return mixed
      *
@@ -246,7 +249,10 @@ class SlimApiWrapper
         // Add Route arguments
         //
         if (!is_array($options['namedArgs'])) {
-            trigger_error('The `namedArgs` in the options parameter must be an array.', E_USER_NOTICE);
+            trigger_error(
+                'The `namedArgs` in the options parameter must be an array.',
+                E_USER_NOTICE
+            );
             $options['namedArgs'] = [];
         }
 
@@ -254,7 +260,10 @@ class SlimApiWrapper
         // Check header options.
         //
         if (!is_array($options['headers'])) {
-            trigger_error('The `headers` in the options parameter must be an array.', E_USER_NOTICE);
+            trigger_error(
+                'The `headers` in the options parameter must be an array.',
+                E_USER_NOTICE
+            );
             $options['headers'] = [];
         }
 
@@ -262,7 +271,10 @@ class SlimApiWrapper
         // Setup Query Params
         //
         if (!is_array($options['queryParams'])) {
-            trigger_error('The `queryParams` in the options parameter must be an array.', E_USER_NOTICE);
+            trigger_error(
+                'The `queryParams` in the options parameter must be an array.',
+                E_USER_NOTICE
+            );
             $options['queryParams'] = [];
         }
 
@@ -282,7 +294,7 @@ class SlimApiWrapper
 
             unset($response);
 
-            return ['statusCode' => $statusCode] + $return;
+            return array_merge(['statusCode' => $statusCode], $return);
         } else {
             return $response;
         }
