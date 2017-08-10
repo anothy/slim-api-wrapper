@@ -28,7 +28,7 @@ class SlimApiWrapperTest extends TestCase
      *
      * @param array $map Return map for get() method.
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \Slim\Container|\PHPUnit_Framework_MockObject_MockObject
      */
     private function stubContainer($map = [])
     {
