@@ -4,6 +4,7 @@ namespace Anothy\SlimApiWrapper\Tests;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Slim\Http\Body;
 
 /**
  * FakeSlimApp
@@ -25,6 +26,10 @@ class FakeSlimApp
         ResponseInterface $response,
         $ags
     ) {
-        return $response;
+        $body = new Body(fopen('php://temp', 'r+'));
+
+        $body->write(json_encode(['foo' => 'bar']));
+
+        return $response->withBody($body);
     }
 }

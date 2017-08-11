@@ -10,14 +10,43 @@ use PHPUnit\Framework\TestCase;
  */
 class SlimApiWrapperTest extends TestCase
 {
-    public function testSomething()
+    /**
+     * Test 'call' method.
+     */
+    public function testCallMethod()
     {
-        $container = $this->stubContainer();
+        // Test where Container has the Callable route.
+        $container = $this->stubContainer([
+            'expects' => [
+                'get' => 2,
+                'has' => 1,
+            ],
+        ]);
         $saw = new SlimApiWrapper($container);
 
         $result = $saw->call('GET', 'test-route');
 
-        $this->assertTrue(true);
+        $this->assertEquals(200, $result['statusCode']);
+        $this->assertEquals('bar', $result['foo']);
+
+        // Test where Container does NOT have Callable route.
+        $container = $this->stubContainer([
+            'map' => [
+                'has' => [
+                    'CallableRoute' => ['CallableRoute', false],
+                ],
+            ],
+            'expects' => [
+                'get' => 1,
+                'has' => 1,
+            ],
+        ]);
+        $saw = new SlimApiWrapper($container);
+
+        $result = $saw->call('GET', 'test-route');
+
+        $this->assertEquals(200, $result['statusCode']);
+        $this->assertEquals('bar', $result['foo']);
     }
 
     // -------------------------------------------------------------------------
@@ -26,28 +55,46 @@ class SlimApiWrapperTest extends TestCase
     /**
      * Create a mock object of Slim\Container
      *
-     * @param array $map Return map for get() method.
+     * @param array $config The map for 'has' and 'get'.
      *
      * @return \Slim\Container|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function stubContainer($map = [])
+    private function stubContainer($config = [])
     {
-        $map = array_merge([
-            ['router',        $this->stubRouter()],
-            ['CallableRoute', new FakeSlimApp()],
-        ], $map);
+        $config = array_merge([
+            'map' => [
+                'get' => [],
+                'has' => [],
+            ],
+            'expects' => [
+                'get' => 0,
+                'has' => 0,
+            ]
+        ], $config);
+
+        $getMap = array_merge([
+            'router'        => ['router',        $this->stubRouter()],
+            'CallableRoute' => [
+                '\Anothy\SlimApiWrapper\Tests\FakeSlimApp',
+                new FakeSlimApp()
+            ],
+        ], (array) $config['map']['get']);
+
+        $hasMap = array_merge([
+            'CallableRoute' => ['\Anothy\SlimApiWrapper\Tests\FakeSlimApp', true],
+        ], (array) $config['map']['has']);
 
         $stub = $this->getMockBuilder('Slim\Container')
                      ->setMethods(['get','has'])
                      ->getMock();
 
-        $stub->expects($this->exactly(2))
+        $stub->expects($this->exactly($config['expects']['get']))
              ->method('get')
-             ->will($this->returnValueMap($map));
+             ->will($this->returnValueMap($getMap));
 
-        $stub->expects($this->exactly(1))
+        $stub->expects($this->exactly($config['expects']['has']))
              ->method('has')
-             ->will($this->returnValue(true));
+             ->will($this->returnValueMap($hasMap));
 
         return $stub;
     }
@@ -79,8 +126,9 @@ class SlimApiWrapperTest extends TestCase
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function stubRoute($callableRoute = 'CallableRoute')
-    {
+    private function stubRoute(
+        $callableRoute = '\Anothy\SlimApiWrapper\Tests\FakeSlimApp'
+    ) {
         $stub = $this->getMockBuilder('Route')
                      ->setMethods(['getMethods','getCallable'])
                      ->getMock();

@@ -1,6 +1,20 @@
 {
     "name": "anothy/slim-api-wrapper",
     "description": "Slim Api Wrapper",
+    "authors": [
+        {
+            "name": "Anthony Dominguez",
+            "email": "anthony.dominguez@gmail.com",
+            "homepage": "https://anothy.ca",
+            "role": "Developer"
+        }
+    ],
+    "keywords": ["slim", "framework", "api"],
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/anothy/slim-api-wrapper/issues",
+        "source": "https://github.com/anothy/slim-api-wrapper"
+    },
     "type": "library",
     "require": {
         "slim/slim": "^3.8"
@@ -12,6 +26,11 @@
     "autoload": {
         "psr-4": {
             "Anothy\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Anothy\\SlimApiWrapper\\Tests\\": "tests/"
         }
     }
 }
