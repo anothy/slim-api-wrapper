@@ -132,6 +132,7 @@ class SlimApiWrapper
             ':',
             $request->getAttribute('route')->getCallable()
         );
+
         if ($this->container->has($routeCallable)) {
             $routeObj = $this->container->get($routeCallable);
         } else {
