@@ -128,10 +128,16 @@ class SlimApiWrapper
         //
         // Skip the Middleware in the path and go straight to the Slim app.
         //
-        list($routeCallable, $routeMethod) = explode(
-            ':',
-            $request->getAttribute('route')->getCallable()
-        );
+        $callable = $request->getAttribute('route')->getCallable();
+        if (preg_match('/\:/', $callable)) {
+            list($routeCallable, $routeMethod) = explode(
+                ':',
+                $callable
+            );
+        } else {
+            $routeCallable = $callable;
+            $routeMethod = null;
+        }
 
         if ($this->container->has($routeCallable)) {
             $routeObj = $this->container->get($routeCallable);

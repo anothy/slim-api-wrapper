@@ -39,13 +39,13 @@ class Builder
                 'has' => [],
             ],
             'expects' => [
-                'get' => 0,
-                'has' => 0,
-            ]
+                'get' => [],
+                'has' => [],
+            ],
         ], $config);
 
         $getMap = array_merge([
-            'router'        => ['router',        $this->stubRouter()],
+            'router'        => ['router', $this->stubRouter()],
             'CallableRoute' => [
                 '\Anothy\SlimApiWrapper\Tests\FakeSlimApp',
                 new FakeSlimApp()

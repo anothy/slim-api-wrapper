@@ -54,6 +54,7 @@ class SlimApiWrapperTest extends TestCase
                 'has' => [
                     'CallableRoute' => ['CallableRoute', false],
                 ],
+                'get' => []
             ],
             'expects' => [
                 'get' => 1,
