@@ -15,18 +15,14 @@ class SlimApiWrapperTest extends TestCase
      */
     private $builder;
 
-    /**
-     * SlimApiWrapperTest constructor.
-     *
-     * @param null   $name
-     * @param array  $data
-     * @param string $dataName
-     */
-    public function __construct($name = null, array $data = [], $dataName = '')
+    protected function setUp()
     {
-        parent::__construct($name, $data, $dataName);
-
         $this->builder = new Builder($this);
+    }
+
+    protected function tearDown()
+    {
+        $this->builder = null;
     }
 
     /**
@@ -64,6 +60,30 @@ class SlimApiWrapperTest extends TestCase
         $saw = new SlimApiWrapper($container);
 
         $result = $saw->call('GET', 'test-route');
+
+        $this->assertEquals(200, $result['statusCode']);
+        $this->assertEquals('bar', $result['foo']);
+    }
+
+    /**
+     * Test the `callMiddlewareStack` method.
+     */
+    public function testCallMiddlewareStack()
+    {
+        // Test where Container does NOT have Callable route.
+        $container = $this->builder->stubContainer([
+            'map' => [
+                'has' => [],
+                'get' => []
+            ],
+            'expects' => [
+                'get' => 1,
+                'has' => 1,
+            ],
+        ]);
+        $saw = new SlimApiWrapper($container);
+
+        $result = $saw->callMiddlewareStack('GET', 'test-route');
 
         $this->assertEquals(200, $result['statusCode']);
         $this->assertEquals('bar', $result['foo']);

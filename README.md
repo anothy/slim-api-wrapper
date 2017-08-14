@@ -1,6 +1,8 @@
 Slim Api Wrapper
 ================
 
+[![Build Status](https://travis-ci.org/anothy/slim-api-wrapper.svg?branch=master)](https://travis-ci.org/anothy/slim-api-wrapper)
+
 Used as a way of accessing Slim App APIs internally.  There are two types of
 accessing the APIs, directly where it skips the traversal of middleware(s),
 or using the full route where it traverses the middleware(s) attached to the

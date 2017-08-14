@@ -102,7 +102,7 @@ class Builder
         $callableRoute = '\Anothy\SlimApiWrapper\Tests\FakeSlimApp'
     ) {
         $stub = $this->testcase->getMockBuilder('Route')
-            ->setMethods(['getMethods','getCallable'])
+            ->setMethods(['getMethods','getCallable','run'])
             ->getMock();
 
         $stub->expects($this->testcase->exactly(1))
@@ -113,6 +113,14 @@ class Builder
             ->method('getCallable')
             ->will(
                 $this->testcase->returnValue($callableRoute)
+            );
+
+        $stub->expects($this->testcase->any())
+            ->method('run')
+            ->will(
+                $this->testcase->returnValue(
+                    (new FakeSlimApp())
+                )
             );
 
         return $stub;
