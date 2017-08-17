@@ -93,7 +93,7 @@ class Builder
                 'map'     => [
                     'router' => ['router', $this->stubRouter()],
                     'CallableRoute' => [
-                        '\MFR\Tests\FakeSlimApp',
+                        '\Anothy\SlimApiWrapper\Tests\FakeSlimApp',
                         new FakeSlimApp()
                     ],
                 ],
@@ -101,7 +101,7 @@ class Builder
             'has' => [
                 'expects' => 1,
                 'map'     => [
-                    'CallableRoute' => ['\MFR\Tests\FakeSlimApp', true],
+                    'CallableRoute' => ['\Anothy\SlimApiWrapper\Tests\FakeSlimApp', true],
                 ],
             ],
         ], $config);
@@ -200,7 +200,7 @@ class Builder
             ],
             'getCallable' => [
                 'expects' => 1,
-                'return' => '\MFR\Tests\FakeSlimApp',
+                'return' => '\Anothy\SlimApiWrapper\Tests\FakeSlimApp',
             ],
         ], $config);
 
