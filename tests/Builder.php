@@ -3,9 +3,11 @@
 namespace Anothy\SlimApiWrapper\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Slim\Router;
+use Slim\Route;
 
 /**
- * Class Factory
+ * Builder for Container, Route, Router objects.
  */
 class Builder
 {
@@ -13,6 +15,27 @@ class Builder
      * @var TestCase
      */
     private $testcase;
+
+    /**
+     * Container Configuration
+     *
+     * @var array
+     */
+    private $containerConfig = [];
+
+    /**
+     * Router Configuration
+     *
+     * @var array
+     */
+    private $routerConfig = [];
+
+    /**
+     * Route Configuration
+     *
+     * @var array
+     */
+    private $routeConfig = [];
 
     /**
      * Builder constructor.
@@ -27,54 +50,69 @@ class Builder
     /**
      * Create a mock object of Slim\Container
      *
-     * @param array $config The map for 'has' and 'get'.
      *
      * @return \Slim\Container|\PHPUnit_Framework_MockObject_MockObject
      */
-    public function stubContainer($config = [])
+    public function stubContainer()
     {
-        $config = array_merge([
-            'map' => [
-                'get' => [],
-                'has' => [],
-            ],
-            'expects' => [
-                'get' => [],
-                'has' => [],
-            ],
-        ], $config);
-
-        $getMap = array_merge([
-            'router'        => ['router', $this->stubRouter()],
-            'CallableRoute' => [
-                '\Anothy\SlimApiWrapper\Tests\FakeSlimApp',
-                new FakeSlimApp()
-            ],
-        ], (array) $config['map']['get']);
-
-        $hasMap = array_merge([
-            'CallableRoute' => ['\Anothy\SlimApiWrapper\Tests\FakeSlimApp', true],
-        ], (array) $config['map']['has']);
-
         $stub = $this->testcase->getMockBuilder('Slim\Container')
             ->setMethods(['get','has'])
             ->getMock();
 
-        $stub->expects($this->testcase->exactly($config['expects']['get']))
+        $stub->expects($this->testcase->exactly(
+            $this->containerConfig['get']['expects']
+        ))
             ->method('get')
-            ->will($this->testcase->returnValueMap($getMap));
+            ->will($this->testcase->returnValueMap(
+                $this->containerConfig['get']['map']
+            ));
 
-        $stub->expects($this->testcase->exactly($config['expects']['has']))
+        $stub->expects($this->testcase->exactly(
+            $this->containerConfig['has']['expects']
+        ))
             ->method('has')
-            ->will($this->testcase->returnValueMap($hasMap));
+            ->will($this->testcase->returnValueMap(
+                $this->containerConfig['has']['map']
+            ));
 
         return $stub;
     }
 
     /**
+     * Configure the container.
+     *
+     * @param array $config
+     *
+     * @return self
+     */
+    public function configureContainer($config = [])
+    {
+        $this->containerConfig = array_merge([
+            'get' => [
+                'expects' => 1,
+                'map'     => [
+                    'router' => ['router', $this->stubRouter()],
+                    'CallableRoute' => [
+                        '\MFR\Tests\FakeSlimApp',
+                        new FakeSlimApp()
+                    ],
+                ],
+            ],
+            'has' => [
+                'expects' => 1,
+                'map'     => [
+                    'CallableRoute' => ['\MFR\Tests\FakeSlimApp', true],
+                ],
+            ],
+        ], $config);
+
+        return $this;
+    }
+
+    /**
      * Create a mock object of Slim\Router
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return Router|\PHPUnit_Framework_MockObject_MockObject
      */
     public function stubRouter()
     {
@@ -82,47 +120,90 @@ class Builder
             ->setMethods(['getNamedRoute'])
             ->getMock();
 
-        $stub->expects($this->testcase->exactly(1))
+        $stub->expects($this->testcase->exactly(
+            $this->routerConfig['getNamedRoute']['expects']
+        ))
             ->method('getNamedRoute')
             ->will(
-                $this->testcase->returnValue($this->stubRoute())
+                $this->testcase->returnValueMap(
+                    $this->routerConfig['getNamedRoute']['map']
+                )
             );
 
         return $stub;
     }
 
     /**
+     * Configure the Router
+     *
+     * @param array $config
+     *
+     * @return self
+     */
+    public function configureRouter($config = [])
+    {
+        $this->routerConfig = array_merge([
+            'getNamedRoute' => [
+                'expects' => 1,
+                'map' => [],
+            ],
+        ], $config);
+
+        return $this;
+    }
+
+    /**
      * Create a mock object of Slim\Route
      *
-     * @param string $callableRoute Return by Router:getCallable()
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return Route|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function stubRoute(
-        $callableRoute = '\Anothy\SlimApiWrapper\Tests\FakeSlimApp'
-    ) {
+    public function stubRoute()
+    {
         $stub = $this->testcase->getMockBuilder('Route')
-            ->setMethods(['getMethods','getCallable','run'])
+            ->setMethods(['getMethods','getCallable'])
             ->getMock();
 
-        $stub->expects($this->testcase->exactly(1))
+        $stub->expects($this->testcase->exactly(
+            $this->routeConfig['getMethods']['expects']
+        ))
             ->method('getMethods')
-            ->will($this->testcase->returnValue(['GET','POST']));
+            ->will($this->testcase->returnValue(
+                $this->routeConfig['getMethods']['return']
+            ));
 
-        $stub->expects($this->testcase->exactly(1))
+        $stub->expects($this->testcase->exactly(
+            $this->routeConfig['getCallable']['expects']
+        ))
             ->method('getCallable')
             ->will(
-                $this->testcase->returnValue($callableRoute)
-            );
-
-        $stub->expects($this->testcase->any())
-            ->method('run')
-            ->will(
                 $this->testcase->returnValue(
-                    (new FakeSlimApp())
+                    $this->routeConfig['getCallable']['return']
                 )
             );
 
         return $stub;
+    }
+
+    /**
+     * Configure the Route object.
+     *
+     * @param array $config
+     *
+     * @return self
+     */
+    public function configureRoute($config = [])
+    {
+        $this->routeConfig = array_merge([
+            'getMethods'  => [
+                'expects' => 1,
+                'return' => ['GET','POST'],
+            ],
+            'getCallable' => [
+                'expects' => 1,
+                'return' => '\MFR\Tests\FakeSlimApp',
+            ],
+        ], $config);
+
+        return $this;
     }
 }
